@@ -44,7 +44,17 @@ YIELD_CURVE_DURATION = sorted(YIELD_CURVE_TENORS.keys())
 
 
 def get_tenor_for(start_date, end_date):
+    # 计算某个时间段的简称， 一个月， 两个月， 几年。
     duration = (end_date - start_date).days
+    # year = duration // 365
+    # month = duration % 365 // 30
+    # if year > 0:
+    #     return '{}Y'.format(year)
+    # elif month > 0:
+    #     return '{}M'.format(month)
+    # else:
+    #     return '0S'
+
     tenor = 0
     for t in YIELD_CURVE_DURATION:
         if duration >= t:

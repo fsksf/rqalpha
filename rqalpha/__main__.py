@@ -124,6 +124,7 @@ def run(**kwargs):
 
     from rqalpha import main
     source_code = kwargs.get("base__source_code")
+    # 整理配置
     cfg = parse_config(kwargs, config_path=config_path, click_type=True, source_code=source_code)
     source_code = cfg.base.source_code
     results = main.run(cfg, source_code=source_code)

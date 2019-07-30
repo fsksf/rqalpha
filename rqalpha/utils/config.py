@@ -99,6 +99,7 @@ def code_config(config, source_code=None):
             pass
         scope = {'define_parameter': noop}
 
+        # 字符串编译为字节代码。
         code = compile(source_code, config["base"]["strategy_file"], 'exec')
         six.exec_(code, scope)
 
@@ -129,7 +130,9 @@ def set_locale(lc):
 
 
 def parse_config(config_args, config_path=None, click_type=False, source_code=None, user_funcs=None):
+    # 加载默认配置
     conf = default_config()
+    # 加载用户的配置文件，默认在  ~/.rqalpha
     deep_update(user_config(), conf)
     deep_update(project_config(), conf)
     if config_path is not None:

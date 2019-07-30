@@ -30,6 +30,9 @@ from rqalpha.utils.datetime_func import convert_int_to_datetime, convert_date_to
 
 
 class DataProxy(InstrumentMixin, TradingDatesMixin):
+    """
+    数据代理，统一接口
+    """
     def __init__(self, data_source, price_board):
         self._data_source = data_source
         self._price_board = price_board
@@ -44,6 +47,12 @@ class DataProxy(InstrumentMixin, TradingDatesMixin):
         return getattr(self._data_source, item)
 
     def get_trading_minutes_for(self, order_book_id, dt):
+        """
+
+        :param order_book_id: 标的物id
+        :param dt: 日期
+        :return:
+        """
         instrument = self.instruments(order_book_id)
         minutes = self._data_source.get_trading_minutes_for(instrument, dt)
         return [] if minutes is None else minutes

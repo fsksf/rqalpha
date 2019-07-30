@@ -21,6 +21,19 @@ import numpy as np
 
 
 class DividendStore(object):
+    """
+    红利；股息；股利
+    ctable((29318,), [('announcement_date', '<u4'), ('closure_date', '<u4'), ('ex_date', '<u4'), ('payable_date', '<u4'), ('cash_before_tax', '<u4'), ('round_lot', '<u4')])
+      nbytes: 687.14 KB; cbytes: 417.11 KB; ratio: 1.65
+      cparams := cparams(clevel=5, shuffle=1, cname='lz4', quantize=0)
+      rootdir := 'original_dividends.bcolz'
+    [(19940615, 19940629, 19940630, 19940630, 10000, 10)
+     (19950721, 19950801, 19950802, 19950804, 20000, 10)
+     (19960828, 19960830, 19960902, 19960906, 3000, 10) ...,
+     (20070327, 20070330, 20070402, 20070402, 28000, 10)
+     (20181217, 20181220, 20181221, 20181226, 55000, 10)
+     (20190614, 20190619, 20190620, 20190625, 25000, 10)]
+    """
     def __init__(self, f):
         ct = bcolz.open(f, 'r')
         self._index = ct.attrs['line_map']
@@ -29,12 +42,12 @@ class DividendStore(object):
             ('ex_dividend_date', '<u4'), ('payable_date', '<u4'),
             ('dividend_cash_before_tax', np.float), ('round_lot', '<u4')
         ]))
-        self._table['announcement_date'][:] = ct['announcement_date']
-        self._table['book_closure_date'][:] = ct['closure_date']
-        self._table['ex_dividend_date'][:] = ct['ex_date']
-        self._table['payable_date'][:] = ct['payable_date']
-        self._table['dividend_cash_before_tax'] = ct['cash_before_tax'][:] / 10000.0
-        self._table['round_lot'][:] = ct['round_lot']
+        self._table['announcement_date'][:] = ct['announcement_date']                   # 公告日期
+        self._table['book_closure_date'][:] = ct['closure_date']                        # 登记日期
+        self._table['ex_dividend_date'][:] = ct['ex_date']                              # 除权日
+        self._table['payable_date'][:] = ct['payable_date']                             # 派息日
+        self._table['dividend_cash_before_tax'] = ct['cash_before_tax'][:] / 10000.0    # 税前现金？？？
+        self._table['round_lot'][:] = ct['round_lot']                                   # 交易单位
 
     def get_dividend(self, order_book_id):
         try:

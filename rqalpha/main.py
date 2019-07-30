@@ -114,30 +114,35 @@ def run(config, source_code=None, user_funcs=None):
         mod_handler.start_up()
 
         try:
+            # future 期货
             future_info = config.base.future_info
         except AttributeError:
             pass
         else:
             deep_update(future_info, future_info_cn.CN_FUTURE_INFO)
 
+        # 数据加载位置
         if not env.data_source:
             env.set_data_source(BaseDataSource(config.base.data_bundle_path))
 
         if env.price_board is None:
+            # 用于查询A股每日涨跌停价格
             from .core.bar_dict_price_board import BarDictPriceBoard
             env.price_board = BarDictPriceBoard()
-
+        # 统一数据出口到 DataProxy,      财报行情数据          涨跌停数据
         env.set_data_proxy(DataProxy(env.data_source, env.price_board))
-
+        # 交易日历
         Scheduler.set_trading_dates_(env.data_source.get_trading_calendar())
         scheduler = Scheduler(config.base.frequency)
         mod_scheduler._scheduler = scheduler
 
         env._universe = StrategyUniverse()
 
+        # 设置的start_data可能不是交易时间
         _adjust_start_date(env.config, env.data_proxy)
 
         # FIXME
+        # 转换date 为 datetime
         start_dt = datetime.datetime.combine(config.base.start_date, datetime.datetime.min.time())
         env.calendar_dt = start_dt
         env.trading_dt = start_dt

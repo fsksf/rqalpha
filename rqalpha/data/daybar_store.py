@@ -25,6 +25,11 @@ from rqalpha.utils.i18n import gettext as _
 
 class DayBarStore(object):
     def __init__(self, main, converter):
+        """
+        获取day bar 的抽象层
+        :param main: 数据path
+        :param converter: 对应的数据转换模型
+        """
         self._table = bcolz.open(main, 'r')
         self._index = self._table.attrs['line_map']
         self._converter = converter

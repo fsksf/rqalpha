@@ -24,10 +24,12 @@ Rule = namedtuple("Rule", ["dtype", "multiplier", "round"])
 
 
 class Converter(object):
+    # 数据转换
     def __init__(self, rules):
         self._rules = rules
 
     def convert(self, name, data):
+        # 单位转换，小数保留
         try:
             r = self._rules[name]
         except KeyError:
@@ -40,6 +42,7 @@ class Converter(object):
         return result
 
     def field_type(self, name, dt):
+        # 返回数据类型
         try:
             return self._rules[name].dtype
         except KeyError:

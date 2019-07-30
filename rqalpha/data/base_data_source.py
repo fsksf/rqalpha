@@ -43,6 +43,7 @@ from rqalpha.data.public_fund_commission import PUBLIC_FUND_COMMISSION
 
 
 class BaseDataSource(AbstractDataSource):
+    # bcolz资源加载模型
     def __init__(self, path):
         if not os.path.exists(path):
             raise RuntimeError('bundle path {} not exist'.format(os.path.abspath(path)))
@@ -56,20 +57,27 @@ class BaseDataSource(AbstractDataSource):
             DayBarStore(_p('futures.bcolz'), FutureDayBarConverter),
             DayBarStore(_p('funds.bcolz'), FundDayBarConverter),
         ]
-
+        # 股票信息
         self._instruments = InstrumentStore(_p('instruments.pk'))
+        # 红利；股息；股利
         self._dividends = DividendStore(_p('original_dividends.bcolz'))
+        # 交易日历
         self._trading_dates = TradingDatesStore(_p('trading_dates.bcolz'))
+        # 国债利率
         self._yield_curve = YieldCurveStore(_p('yield_curve.bcolz'))
+        # 拆合股
         self._split_factor = SimpleFactorStore(_p('split_factor.bcolz'))
         self._ex_cum_factor = SimpleFactorStore(_p('ex_cum_factor.bcolz'))
+        # 股权变更？？？
         self._share_transformation = ShareTransformationStore(_p('share_transformation.json'))
-
+        # 带帽日期
         self._st_stock_days = DateSet(_p('st_stock_days.bcolz'))
+        # 停牌时间
         self._suspend_days = DateSet(_p('suspended_days.bcolz'))
 
         self.get_yield_curve = self._yield_curve.get_yield_curve
         self.get_risk_free_rate = self._yield_curve.get_risk_free_rate
+        # 基金
         if os.path.exists(_p('public_funds.bcolz')):
             self._day_bars.append(DayBarStore(_p('public_funds.bcolz'), PublicFundDayBarConverter))
             self._public_fund_dividends = DividendStore(_p('public_fund_dividends.bcolz'))
@@ -189,6 +197,7 @@ class BaseDataSource(AbstractDataSource):
                            fields, adjust_type, adjust_orig)
 
     def get_yield_curve(self, start_date, end_date, tenor=None):
+
         return self._yield_curve.get_yield_curve(start_date, end_date, tenor)
 
     def get_risk_free_rate(self, start_date, end_date):

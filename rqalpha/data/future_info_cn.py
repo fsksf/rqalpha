@@ -18,6 +18,7 @@
 
 from rqalpha.const import COMMISSION_TYPE
 
+# future期货 费率
 CN_FUTURE_INFO = {
     'A': {'close_commission_ratio': 2.0,
           'close_commission_today_ratio': 0.0,
