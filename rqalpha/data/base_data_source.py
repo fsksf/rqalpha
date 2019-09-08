@@ -120,10 +120,16 @@ class BaseDataSource(AbstractDataSource):
     }
 
     def _index_of(self, instrument):
+        # 获取某类型数据的index
         return self.INSTRUMENT_TYPE_MAP[instrument.type]
 
     @lru_cache(None)
     def _all_day_bars_of(self, instrument):
+        """
+        获取标的的数据的所有历史数据
+        :param instrument:
+        :return:
+        """
         i = self._index_of(instrument)
         return self._day_bars[i].get_bars(instrument.order_book_id, fields=None)
 
@@ -135,6 +141,13 @@ class BaseDataSource(AbstractDataSource):
         return bars[bars['volume'] > 0]
 
     def get_bar(self, instrument, dt, frequency):
+        """
+        获取
+        :param instrument:
+        :param dt:
+        :param frequency:
+        :return:
+        """
         if frequency != '1d':
             raise NotImplementedError
 
