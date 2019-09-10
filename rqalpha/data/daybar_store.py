@@ -42,6 +42,12 @@ class DayBarStore(object):
             pass
 
     def get_bars(self, order_book_id, fields=None):
+        """
+        获取单个symbol的整个历史
+        :param order_book_id:
+        :param fields:
+        :return:
+        """
         try:
             s, e = self._index[order_book_id]
         except KeyError:

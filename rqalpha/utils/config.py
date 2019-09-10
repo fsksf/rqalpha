@@ -73,6 +73,7 @@ def load_config_from_folder(folder):
 
 
 def default_config():
+    # 默认位置配置
     base = load_yaml(default_config_path)
     base['base']['source_code'] = None
     mod = load_yaml(default_mod_config_path)
@@ -81,10 +82,12 @@ def default_config():
 
 
 def user_config():
+    # 用户自定义目录配置: ~/.rqalpha
     return load_config_from_folder(rqalpha_path)
 
 
 def project_config():
+    # 获取pwd目录配置文件
     return load_config_from_folder(os.getcwd())
 
 
@@ -99,7 +102,7 @@ def code_config(config, source_code=None):
             pass
         scope = {'define_parameter': noop}
 
-        # 字符串编译为字节代码。
+        # 字符串编译进入strategy_file, 为字节代码。
         code = compile(source_code, config["base"]["strategy_file"], 'exec')
         six.exec_(code, scope)
 
@@ -130,10 +133,20 @@ def set_locale(lc):
 
 
 def parse_config(config_args, config_path=None, click_type=False, source_code=None, user_funcs=None):
-    # 加载默认配置
+    """
+    配置汇总函数
+    :param config_args: 用户命令行输入的参数
+    :param config_path:
+    :param click_type:
+    :param source_code:
+    :param user_funcs:
+    :return:
+    """
+    # 加载默认配置, 并把所有的配置都放到conf变量内部
     conf = default_config()
     # 加载用户的配置文件，默认在  ~/.rqalpha
     deep_update(user_config(), conf)
+    # 获取pwd目录配置
     deep_update(project_config(), conf)
     if config_path is not None:
         deep_update(load_yaml(config_path), conf)
@@ -146,6 +159,7 @@ def parse_config(config_args, config_path=None, click_type=False, source_code=No
         conf['base']['strategy_file'] = config_args['base']['strategy_file']
 
     if user_funcs is None:
+        # 将策略代码编译进入conf['base']['strategy_file']
         for k, v in six.iteritems(code_config(conf, source_code)):
             if k in conf['whitelist']:
                 deep_update(v, conf[k])
@@ -156,6 +170,7 @@ def parse_config(config_args, config_path=None, click_type=False, source_code=No
         config_args[key] = mod_config_value_parse(v)
 
     if click_type:
+        # a__b__c: 123 -->  {a: {b: {c: 123}}}
         for k, v in six.iteritems(config_args):
             if v is None:
                 continue
@@ -174,6 +189,7 @@ def parse_config(config_args, config_path=None, click_type=False, source_code=No
 
     config = RqAttrDict(conf)
 
+    # 解决时区语言等问题
     set_locale(config.extra.locale)
 
     def _to_date(v):
@@ -233,6 +249,7 @@ def parse_future_info(future_info):
 
 
 def parse_accounts(accounts):
+    # 初始化各类资产账户初始资金
     a = {}
     if isinstance(accounts, tuple):
         accounts = {account_type: starting_cash for account_type, starting_cash in accounts}
@@ -250,12 +267,14 @@ def parse_accounts(accounts):
 
 
 def parse_init_positions(positions):
+    # 初始化持仓
     # --position 000001.XSHE:1000,IF1701:-1
     result = []
     if not isinstance(positions, str):
         return result
     for s in positions.split(','):
         try:
+            # 000001.XSHE, 1000
             order_book_id, quantity = s.split(':')
         except ValueError:
             raise RuntimeError(_(u"invalid init position {}, should be in format 'order_book_id:quantity'").format(s))
@@ -270,10 +289,11 @@ def parse_init_positions(positions):
 
 def parse_run_type(rt_str):
     assert isinstance(rt_str, six.string_types)
+    # 选择交易类型
     mapping = {
-        "b": RUN_TYPE.BACKTEST,
-        "p": RUN_TYPE.PAPER_TRADING,
-        "r": RUN_TYPE.LIVE_TRADING,
+        "b": RUN_TYPE.BACKTEST,         # 回测
+        "p": RUN_TYPE.PAPER_TRADING,    # 模拟交易
+        "r": RUN_TYPE.LIVE_TRADING,     # 实盘交易
     }
     try:
         return mapping[rt_str]
@@ -282,6 +302,7 @@ def parse_run_type(rt_str):
 
 
 def parse_persist_mode(persist_mode):
+    # ??? 报告呈现方式? 实时, 崩溃后, 非正常退出
     assert isinstance(persist_mode, six.string_types)
     mapping = {
         "real_time": PERSIST_MODE.REAL_TIME,

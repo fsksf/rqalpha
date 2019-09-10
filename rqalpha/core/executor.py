@@ -49,12 +49,15 @@ class Executor(object):
             self._env.trading_dt = e.trading_dt
 
         def publish_settlement():
+            # settlement 解决，处理；殖民；结算；沉降
+            #
             event_bus.publish_event(PRE_SETTLEMENT)
             event_bus.publish_event(Event(EVENT.SETTLEMENT))
             event_bus.publish_event(POST_SETTLEMENT)
 
         def check_before_trading(e):
             if self._last_before_trading == event.trading_dt.date():
+                # 如果 数据最后时间 == 回测时间
                 return False
 
             if self._env.config.extra.is_hold:

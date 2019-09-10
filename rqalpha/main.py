@@ -92,6 +92,7 @@ def create_base_scope(copy_scope=False):
 
 
 def run(config, source_code=None, user_funcs=None):
+    # config = parse_config(config_path)
     env = Environment(config)
     persist_helper = None
     init_succeed = False
